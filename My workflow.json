@@ -1,0 +1,175 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "f54a415c-0596-4f2c-80b2-874614795f11",
+        "responseMode": "responseNode",
+        "options": {
+          "binaryPropertyName": "data"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        -720,
+        -208
+      ],
+      "id": "ed5a2b9c-cc35-4ef9-a3d3-2dabae3cb7b4",
+      "name": "Webhook",
+      "webhookId": "f54a415c-0596-4f2c-80b2-874614795f11"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        -288,
+        -48
+      ],
+      "id": "05c0ecc7-b3b4-4142-ad4e-7d7694d72169",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "y8cgTfeQYVycapFR",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Analyze the following research paper.\n\n{{$json.text}}\n\nGenerate a structured report with:\n\n1. Paper Title\n2. Authors (if available)\n3. Abstract summary\n4. Key contributions\n5. Methodology\n6. Advantages\n7. Limitations\n8. Future work\n\nMake the explanations concise and technical.",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        -288,
+        -208
+      ],
+      "id": "b6d823f8-8b8e-4597-a9c4-0c70390cc19f",
+      "name": "Basic LLM Chain1"
+    },
+    {
+      "parameters": {
+        "respondWith": "binary",
+        "responseDataSource": "set",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        224,
+        -208
+      ],
+      "id": "aac8b06e-fe4e-4ab6-af0e-ee0b5554314d",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "data0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -496,
+        -208
+      ],
+      "id": "ecd4d865-31f8-4d9c-835f-013842657f9f",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "operation": "toText",
+        "sourceProperty": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        32,
+        -208
+      ],
+      "id": "b054fbc7-23e5-4307-87bb-3ae325371725",
+      "name": "Convert to File"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain1": {
+      "main": [
+        [
+          {
+            "node": "Convert to File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert to File": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "d12909a4-7bfc-42d0-8f17-7377f61e9bf0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "150e3cc12609e5aab879e750e7dd74d5c1d4ce2af09bf7722dcf4474edbf23c6"
+  },
+  "id": "OVxCNCmcUXnYr7el",
+  "tags": []
+}
