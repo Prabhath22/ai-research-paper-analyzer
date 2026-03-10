@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Research Paper Analyzer</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+
+<div class="bg-gray-800 p-10 rounded-2xl shadow-xl w-[420px] text-center">
+
+<h1 class="text-3xl font-bold mb-3">
+AI Research Paper Analyzer
+</h1>
+
+<p class="text-gray-400 mb-6">
+Upload a research paper PDF and get an AI-generated summary.
+</p>
+
+<div id="dropArea"
+class="border-2 border-dashed border-gray-500 rounded-lg p-6 mb-4 cursor-pointer hover:border-blue-500">
+
+<p class="text-gray-300">
+Drag & Drop PDF here
+</p>
+
+<p class="text-gray-500 text-sm">
+or click to upload
+</p>
+
+<input type="file" id="fileInput" accept=".pdf" class="hidden">
+
+</div>
+
+<button onclick="uploadPDF()"
+class="bg-blue-600 hover:bg-blue-700 px-6 py-2 rounded-lg w-full font-semibold">
+
+Analyze Paper
+
+</button>
+
+<p id="status" class="mt-4 text-gray-400"></p>
+
+</div>
+
+<script>
+
+const dropArea = document.getElementById("dropArea")
+const fileInput = document.getElementById("fileInput")
+const status = document.getElementById("status")
+
+let uploadedFile = null
+
+dropArea.addEventListener("click", () => fileInput.click())
+
+fileInput.addEventListener("change", () => {
+uploadedFile = fileInput.files[0]
+status.innerText = "Selected: " + uploadedFile.name
+})
+
+dropArea.addEventListener("dragover", (e) => {
+e.preventDefault()
+dropArea.classList.add("border-blue-500")
+})
+
+dropArea.addEventListener("dragleave", () => {
+dropArea.classList.remove("border-blue-500")
+})
+
+dropArea.addEventListener("drop", (e) => {
+e.preventDefault()
+dropArea.classList.remove("border-blue-500")
+
+uploadedFile = e.dataTransfer.files[0]
+
+status.innerText = "Selected: " + uploadedFile.name
+})
+
+async function uploadPDF(){
+
+if(!uploadedFile){
+alert("Please upload a PDF file")
+return
+}
+
+status.innerText = "Analyzing research paper..."
+
+const formData = new FormData()
+formData.append("data", uploadedFile)
+
+const response = await fetch(
+"https://prabhath.app.n8n.cloud/webhook/f54a415c-0596-4f2c-80b2-874614795f11",
+{
+method: "POST",
+body: formData
+}
+)
+
+const blob = await response.blob()
+
+const url = window.URL.createObjectURL(blob)
+
+const a = document.createElement("a")
+a.href = url
+a.download = "research-analysis.html"
+a.click()
+
+status.innerText = "Analysis complete! Download started."
+
+}
+
+</script>
+
+</body>
+</html>
